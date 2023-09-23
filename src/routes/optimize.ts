@@ -24,8 +24,13 @@ router.post("/", async (req, res) => {
     order.products = [...uniqueProducts] as [string, ...string[]];
   }
 
-  // TODO: error handling + logging
-  const productsWithPositionData = await warehouseService.fetchManyProductPositions(order.products);
+  let productsWithPositionData;
+  try {
+    productsWithPositionData = await warehouseService.fetchManyProductPositions(order.products);
+  } catch (e) {
+    req.log.error(e, "Failed to fetch products positions.");
+    return res.status(500).json({ message: "Failed to fetch products positions." });
+  }
 
   const startingPosition = {
     positionId: "__start-position-id",
