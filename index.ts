@@ -1,25 +1,24 @@
 import "dotenv/config";
-import { router as optimizeRouter } from "./src/routes/optimize";
-
-import express, { Request, Response, NextFunction } from "express";
-import { ZodError } from "zod";
+import express from "express";
 import pino from "pino-http";
+import { router as optimizeRouter } from "./src/routes/optimize";
+import { errorMiddleware } from "./src/middlewares/errorMiddleware";
+import { logger } from "./src/logger";
+import { z } from "zod";
 
+const port = z.number().default(3000).parse(process.env.PORT);
 const app = express();
 
-app.use(pino());
+app.use(
+  pino({
+    logger,
+  })
+);
 app.use(express.json());
-
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  if (err instanceof ZodError) {
-    return res.status(400).json(err);
-  }
-  req.log.error({ message: "Uncaught exception occurred", error: err });
-  res.status(500).json({ message: "Something went wrong." });
-});
+app.use(errorMiddleware);
 
 app.use("/order/optimize", optimizeRouter);
 
-app.listen(3000, () => {
-  console.log(`App started on port 3000`);
+app.listen(port, () => {
+  console.log(`App started on port ${port}`);
 });
