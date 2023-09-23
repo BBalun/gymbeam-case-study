@@ -18,6 +18,8 @@
     "combinatorial-generators": "^1.1.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "wretch": "^2.7.0"
+    "pino-http": "^8.5.0",
+    "wretch": "^2.7.0",
+    "zod": "^3.22.2"
   }
 }
