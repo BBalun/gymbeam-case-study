@@ -36,9 +36,7 @@ router.post("/", async (req, res) => {
     positionId: "__start-position-id",
     productId: "",
     quantity: 0,
-    x: order.startingPosition.x,
-    y: order.startingPosition.y,
-    z: order.startingPosition.z,
+    ...order.startingPosition,
   };
 
   const positions = productsWithPositionData.flatMap((p) => p.positions);
