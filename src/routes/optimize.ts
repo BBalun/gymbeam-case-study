@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import * as warehouseService from "../services/warehouseService";
 import { calculateAdjacencyMatrix, generateProductCombinations, generateProductPermutations } from "../utils";
-import { permutations } from "combinatorial-generators";
 
 const router = Router();
 
@@ -17,11 +16,7 @@ const orderValidator = z.object({
 });
 
 router.post("/", async (req, res) => {
-  const orderValidationResult = orderValidator.safeParse(req.body);
-  if (!orderValidationResult.success) {
-    return res.status(400).json(orderValidationResult.error);
-  }
-  const order = orderValidationResult.data;
+  const order = orderValidator.parse(req.body);
 
   const uniqueProducts = new Set(order.products);
   if (uniqueProducts.size !== order.products.length) {
@@ -40,6 +35,7 @@ router.post("/", async (req, res) => {
     y: order.startingPosition.y,
     z: order.startingPosition.z,
   };
+
   const positions = productsWithPositionData.flatMap((p) => p.positions);
   positions.push(startingPosition);
   const adjacencyMatrix = calculateAdjacencyMatrix(positions);
