@@ -2,9 +2,9 @@ import "dotenv/config";
 import express from "express";
 import pino from "pino-http";
 import { router as optimizeRouter } from "./src/routes/optimize";
-import { errorMiddleware } from "./src/middlewares/errorMiddleware";
 import { logger } from "./src/logger";
 import { z } from "zod";
+import { errorMiddleware } from "./src/middlewares/errorMiddleware";
 
 const port = z.number().default(3000).parse(process.env.PORT);
 const app = express();
@@ -20,5 +20,5 @@ app.use(errorMiddleware);
 app.use("/order/optimize", optimizeRouter);
 
 app.listen(port, () => {
-  console.log(`App started on port ${port}`);
+  logger.info(`App started on port ${port}`);
 });

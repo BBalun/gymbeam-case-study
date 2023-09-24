@@ -1,5 +1,5 @@
 import wretch from "wretch";
-import { retry } from "wretch/middlewares";
+import { retry } from "wretch/middlewares/retry";
 
 export type ProductPositionData = {
   positionId: string;
