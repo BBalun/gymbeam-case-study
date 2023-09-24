@@ -5,7 +5,7 @@ This repository contains a solution to the GymBeam case study.
 This solution also contains a postman collection with some example requests. It is located in the `postman` directory.
 
 ## Steps to run a project
-1. Create `.env` file with required environment variables. 
+1. Create `.env` file with required environment variables. (See the [environment variables](#environment-variables) section)
 1. `npm i`
 1. `npm start`
 
