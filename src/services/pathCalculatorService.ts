@@ -20,7 +20,7 @@ export function calculateShortestPath(order: Order, productsWithPositions: Produ
   const adjacencyMatrix = calculateAdjacencyMatrix(positions);
 
   let shortestPath: ShortestPath = {
-    distance: 0,
+    distance: Infinity,
     path: [],
   };
 
@@ -37,7 +37,7 @@ export function calculateShortestPath(order: Order, productsWithPositions: Produ
         pathDistance += adjacencyMatrix[from.positionId][to.positionId];
       }
 
-      if (!shortestPath || pathDistance < shortestPath.distance) {
+      if (pathDistance < shortestPath.distance) {
         shortestPath = { distance: pathDistance, path };
       }
     }

@@ -14,10 +14,10 @@ app.use(
     logger,
   })
 );
-app.use(express.json());
-app.use(errorMiddleware);
 
+app.use(express.json());
 app.use("/order/optimize", optimizeRouter);
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   logger.info(`App started on port ${port}`);
