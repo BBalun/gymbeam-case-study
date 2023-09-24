@@ -24,7 +24,12 @@ export async function fetchProductPositions(productId: string) {
   return await api.get(`/products/${productId}/positions`).json<ProductPositionData[]>();
 }
 
-export async function fetchManyProductPositions(productIds: string[]) {
+export type ProductWithPositions = {
+  product: string;
+  positions: ProductPositionData[];
+};
+
+export async function fetchManyProductPositions(productIds: string[]): Promise<ProductWithPositions[]> {
   return await Promise.all(
     productIds.map(async (p) => {
       const positions = await fetchProductPositions(p);
