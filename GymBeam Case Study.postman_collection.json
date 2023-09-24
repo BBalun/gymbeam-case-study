@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "82b72b53-999e-42d2-8c07-0eda187d390c",
+		"name": "GymBeam Case Study",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21711629"
+	},
+	"item": [
+		{
+			"name": "Failing Examples",
+			"item": [
+				{
+					"name": "Optimaze order - validation failed (invalid input)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"products\": [\"product-1\", \"\"],    \r\n  \"startingPosition\": {\r\n    \"x\": 0,\r\n    \"y\": 0,\r\n    \"z\": 3\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/order/optimize",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"order",
+								"optimize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Optimaze order - product missing from warehouse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"products\": [\"product-1\", \"not-existing-product-id\"],    \r\n  \"startingPosition\": {\r\n    \"x\": 0,\r\n    \"y\": 0,\r\n    \"z\": 0\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/order/optimize",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"order",
+								"optimize"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Successful Examples",
+			"item": [
+				{
+					"name": "Optimaze order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"products\": [\"product-1\", \"product-2\"],    \r\n  \"startingPosition\": {\r\n    \"x\": 1,\r\n    \"y\": 2,\r\n    \"z\": 3\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/order/optimize",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"order",
+								"optimize"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
