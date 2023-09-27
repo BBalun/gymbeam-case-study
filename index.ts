@@ -6,7 +6,7 @@ import { logger } from "./src/logger";
 import { z } from "zod";
 import { errorMiddleware } from "./src/middlewares/errorMiddleware";
 
-const port = z.number().default(3000).parse(process.env.PORT);
+const port = z.number({ coerce: true }).default(3000).parse(process.env.PORT);
 const app = express();
 
 app.use(
