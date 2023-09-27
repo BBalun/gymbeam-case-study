@@ -1,5 +1,10 @@
 import { Order } from "../routes/optimize";
-import { calculateAdjacencyMatrix, generateProductCombinations, generateProductPermutations } from "../utils";
+import {
+  AdjacencyMatrix,
+  calculateAdjacencyMatrix,
+  generateProductCombinations,
+  generateProductPermutations,
+} from "../utils";
 import { ProductPositionData, ProductWithPositions } from "./warehouseService";
 
 export type ShortestPath = {
@@ -16,8 +21,7 @@ export function calculateShortestPath(order: Order, productsWithPositions: Produ
   };
 
   const positions = productsWithPositions.flatMap((p) => p.positions);
-  positions.push(startingPosition);
-  const adjacencyMatrix = calculateAdjacencyMatrix(positions);
+  const adjacencyMatrix = calculateAdjacencyMatrix([startingPosition, ...positions]);
 
   let shortestPath: ShortestPath = {
     distance: Infinity,
@@ -26,22 +30,61 @@ export function calculateShortestPath(order: Order, productsWithPositions: Produ
 
   const productCombinations = generateProductCombinations(productsWithPositions);
   for (const products of productCombinations) {
-    for (const path of generateProductPermutations(products)) {
-      // Start with a distance from starting position to the first product
-      const firstProductInPath = path[0];
-      let pathDistance = adjacencyMatrix[startingPosition.positionId][firstProductInPath.positionId];
-      // Then add all distance between products on selected path
-      for (let i = 0; i < path.length - 1; ++i) {
-        const from = path[i];
-        const to = path[i + 1];
-        pathDistance += adjacencyMatrix[from.positionId][to.positionId];
-      }
-
-      if (pathDistance < shortestPath.distance) {
-        shortestPath = { distance: pathDistance, path };
-      }
+    const path = findShortestPath(startingPosition, products, adjacencyMatrix);
+    if (path.distance < shortestPath.distance) {
+      shortestPath = path;
     }
   }
+
+  shortestPath.path = shortestPath.path.filter((p) => p !== startingPosition);
+  return shortestPath;
+}
+
+const cache: Record<string, ShortestPath> = {};
+
+function encode(start: ProductPositionData, products: ProductPositionData[]) {
+  return [start, ...products].map((p) => p.positionId).join(",");
+}
+
+function findShortestPath(
+  start: ProductPositionData,
+  products: ProductPositionData[],
+  adjacencyMatrix: AdjacencyMatrix
+): ShortestPath {
+  const encoded = encode(start, products);
+  const foo = cache[encoded];
+  if (foo) {
+    return foo;
+  }
+
+  if (products.length < 1) {
+    return {
+      distance: 0,
+      path: [start],
+    };
+  }
+
+  let shortestPath: ShortestPath = {
+    distance: Infinity,
+    path: [],
+  };
+
+  for (const next of products) {
+    const rest = products.filter((p) => p !== next);
+    const restOfShortestPath = findShortestPath(next, rest, adjacencyMatrix);
+    const distanceFromStartToNext = adjacencyMatrix[start.positionId][next.positionId];
+
+    const path = {
+      distance: distanceFromStartToNext + restOfShortestPath.distance,
+      path: [start, ...restOfShortestPath.path],
+    };
+
+    if (path.distance < shortestPath.distance) {
+      shortestPath = path;
+    }
+  }
+
+  cache[encoded] = shortestPath;
 
   return shortestPath;
 }
