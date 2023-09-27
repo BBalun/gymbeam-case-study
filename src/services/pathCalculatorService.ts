@@ -1,10 +1,5 @@
 import { Order } from "../routes/optimize";
-import {
-  AdjacencyMatrix,
-  calculateAdjacencyMatrix,
-  generateProductCombinations,
-  generateProductPermutations,
-} from "../utils";
+import { AdjacencyMatrix, calculateAdjacencyMatrix, generateProductCombinations } from "../utils";
 import { ProductPositionData, ProductWithPositions } from "./warehouseService";
 
 export type ShortestPath = {
@@ -29,18 +24,20 @@ export function calculateShortestPath(order: Order, productsWithPositions: Produ
   };
 
   const productCombinations = generateProductCombinations(productsWithPositions);
+  const cache: Record<string, ShortestPath> = {};
+
   for (const products of productCombinations) {
-    const path = findShortestPath(startingPosition, products, adjacencyMatrix);
+    const path = findShortestPath(startingPosition, products, adjacencyMatrix, cache);
     if (path.distance < shortestPath.distance) {
       shortestPath = path;
     }
   }
 
+  // remove starting point
   shortestPath.path = shortestPath.path.filter((p) => p !== startingPosition);
+
   return shortestPath;
 }
-
-const cache: Record<string, ShortestPath> = {};
 
 function encode(start: ProductPositionData, products: ProductPositionData[]) {
   return [start, ...products].map((p) => p.positionId).join(",");
@@ -49,12 +46,13 @@ function encode(start: ProductPositionData, products: ProductPositionData[]) {
 function findShortestPath(
   start: ProductPositionData,
   products: ProductPositionData[],
-  adjacencyMatrix: AdjacencyMatrix
+  adjacencyMatrix: AdjacencyMatrix,
+  cache: Record<string, ShortestPath>
 ): ShortestPath {
-  const encoded = encode(start, products);
-  const foo = cache[encoded];
-  if (foo) {
-    return foo;
+  const encodedName = encode(start, products);
+  const cachedValue = cache[encodedName];
+  if (cachedValue) {
+    return cachedValue;
   }
 
   if (products.length < 1) {
@@ -71,7 +69,7 @@ function findShortestPath(
 
   for (const next of products) {
     const rest = products.filter((p) => p !== next);
-    const restOfShortestPath = findShortestPath(next, rest, adjacencyMatrix);
+    const restOfShortestPath = findShortestPath(next, rest, adjacencyMatrix, cache);
     const distanceFromStartToNext = adjacencyMatrix[start.positionId][next.positionId];
 
     const path = {
@@ -84,7 +82,7 @@ function findShortestPath(
     }
   }
 
-  cache[encoded] = shortestPath;
+  cache[encodedName] = shortestPath;
 
   return shortestPath;
 }
